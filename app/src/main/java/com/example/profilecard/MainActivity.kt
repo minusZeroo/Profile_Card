@@ -47,7 +47,7 @@ fun MainScreen(playerProfiles: List<PlayerProfile> = playerProfileList) {
             //so use rows or columns
             Column() {
                 for (playerProfile in playerProfiles)
-                ProfileCard(playerProfile = playerProfile)
+                    ProfileCard(playerProfile = playerProfile)
             }
         }
     }
@@ -55,13 +55,19 @@ fun MainScreen(playerProfiles: List<PlayerProfile> = playerProfileList) {
 
 @Composable
 fun AppBar() {
-    TopAppBar(navigationIcon = { Icon(Icons.Default.Home, "content description", Modifier.padding(horizontal = 12.dp))},
-        title = { Text("Current Football players") }
+    TopAppBar(navigationIcon = {
+        Icon(
+            Icons.Default.Home,
+            "content description",
+            Modifier.padding(horizontal = 12.dp)
         )
+    },
+        title = { Text("Current Football players") }
+    )
 }
 
 @Composable
-fun ProfileCard(playerProfile: PlayerProfile){
+fun ProfileCard(playerProfile: PlayerProfile) {
     //since we are making a profile card layout
     //this composable should be a card
     //make this card as wide as the screen and also the height
@@ -72,11 +78,19 @@ fun ProfileCard(playerProfile: PlayerProfile){
     //but a Card can only accept one composable, therefore it will have an...
     //issue of rendering 2 composables ontop of the other
     //Therefore, we use a row and a column
-    Card(modifier = Modifier
-        .padding(top = 8.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
-        .fillMaxWidth()
-        .wrapContentHeight(align = Alignment.Top), elevation = 8.dp, backgroundColor = Color.White) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) { //specify some alignments for the card //this is the row for the text
+    Card(
+        modifier = Modifier
+            .padding(top = 8.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
+            .fillMaxWidth()
+            .wrapContentHeight(align = Alignment.Top),
+        elevation = 8.dp,
+        backgroundColor = Color.White
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) { //specify some alignments for the card //this is the row for the text
             ProfilePicture(playerProfile.drawable, playerProfile.status)
             ProfileContent(playerProfile.name, playerProfile.status)
         }
@@ -92,15 +106,21 @@ fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
     //specify a border to this circle shape
     //also add some padding
     //add some elevation for the picture
-    Card(shape = CircleShape, border = BorderStroke(width = 2.dp,
-        color = if (onlineStatus)
-                    MaterialTheme.colors.lightGreen
-                else Color.Red),
-        modifier = Modifier.padding(16.dp), elevation = 4.dp) {
+    Card(
+        shape = CircleShape, border = BorderStroke(
+            width = 2.dp,
+            color = if (onlineStatus)
+                MaterialTheme.colors.lightGreen
+            else Color.Red
+        ),
+        modifier = Modifier.padding(16.dp), elevation = 4.dp
+    ) {
         //we need an Image: add a description and size
-        Image(painter = painterResource(id = drawableId),
+        Image(
+            painter = painterResource(id = drawableId),
             contentDescription = "describe the picture", modifier = Modifier.size(72.dp),
-            contentScale = ContentScale.Crop)
+            contentScale = ContentScale.Crop
+        )
         //if the image is too big, crop it
 
     }
@@ -114,16 +134,26 @@ fun ProfileContent(playerName: String, onlineStatus: Boolean) {
     //name of the user should be on top of the activity text
     //side by side is row
     //top and bottom is column
-    Column(modifier = Modifier
-        .padding(8.dp)
-        .fillMaxWidth()) { //column should fill the width
-        Text(text = playerName, style = MaterialTheme.typography.h5)
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) { //column should fill the width
 
-        //to make status text abit more transparent, we have to change its alpha
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            Text(text = if (onlineStatus)
-                        "Active now" else "Offline",
-                style = MaterialTheme.typography.body2)
+        CompositionLocalProvider(LocalContentAlpha provides (
+                if (onlineStatus)
+                    1f else ContentAlpha.medium)){
+            Text(text = playerName, style = MaterialTheme.typography.h5
+            )
+        }
+
+                //to make status text abit more transparent, we have to change its alpha
+                CompositionLocalProvider (LocalContentAlpha provides ContentAlpha.medium) {
+            Text(
+                text = if (onlineStatus)
+                    "Active now" else "Offline",
+                style = MaterialTheme.typography.body2
+            )
         }
     }
 }
@@ -131,7 +161,7 @@ fun ProfileContent(playerName: String, onlineStatus: Boolean) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    MyTheme(){
+    MyTheme() {
         MainScreen()
     }
 }

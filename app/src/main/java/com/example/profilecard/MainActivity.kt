@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -20,6 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.Coil
 import com.example.profilecard.ui.theme.MyTheme
 import com.example.profilecard.ui.theme.lightGreen
 
@@ -45,9 +48,12 @@ fun MainScreen(playerProfiles: List<PlayerProfile> = playerProfileList) {
 
             //since we cannot have 2 composable put we want to user cards
             //so use rows or columns
-            Column() {
-                for (playerProfile in playerProfiles)
+
+            //using LazyCoumns for multiple cards
+            LazyColumn {
+                items(playerProfiles) { playerProfile ->
                     ProfileCard(playerProfile = playerProfile)
+                }
             }
         }
     }
@@ -115,6 +121,7 @@ fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
         ),
         modifier = Modifier.padding(16.dp), elevation = 4.dp
     ) {
+
         //we need an Image: add a description and size
         Image(
             painter = painterResource(id = drawableId),

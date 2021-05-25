@@ -1,10 +1,12 @@
 package com.example.profilecard
 
 import android.os.Bundle
+import android.service.autofill.OnClickAction
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,6 +25,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.Coil
 import com.example.profilecard.ui.theme.MyTheme
 import com.example.profilecard.ui.theme.lightGreen
@@ -32,14 +39,27 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyTheme() {
-                MainScreen()
+                playersApplication()
             }
         }
     }
 }
 
 @Composable
-fun MainScreen(playerProfiles: List<PlayerProfile> = playerProfileList) {
+fun playersApplication(playerProfiles: List<PlayerProfile> = playerProfileList) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "players_list") {
+        composable("players_list"){
+            playerListScreen(playerProfiles, navController)
+        }
+        composable("player_details") {
+            playerProfileDetailsScreen()
+        }
+    }
+}
+
+@Composable
+fun playerListScreen(playerProfiles: List<PlayerProfile>, navController: NavHostController?) {
     Scaffold(topBar = { AppBar() }) {
         //add a surface so that we have a background
         //Fill the screen and make the color Light gray
@@ -53,7 +73,9 @@ fun MainScreen(playerProfiles: List<PlayerProfile> = playerProfileList) {
             //using LazyCoumns for multiple cards
             LazyColumn {
                 items(playerProfiles) { playerProfile ->
-                    ProfileCard(playerProfile = playerProfile)
+                    ProfileCard(playerProfile = playerProfile) {
+                        navController?.navigate("player_details")
+                    }
                 }
             }
         }
@@ -79,13 +101,7 @@ fun playerProfileDetailsScreen(playerProfiles: PlayerProfile = playerProfileList
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun playerProfileDetailsPreview() {
-    MyTheme() {
-        playerProfileDetailsScreen()
-    }
-}
+
 
 @Composable
 fun AppBar() {
@@ -101,7 +117,7 @@ fun AppBar() {
 }
 
 @Composable
-fun ProfileCard(playerProfile: PlayerProfile) {
+fun ProfileCard(playerProfile: PlayerProfile, clickAction: () -> Unit) {
     //since we are making a profile card layout
     //this composable should be a card
     //make this card as wide as the screen and also the height
@@ -116,7 +132,8 @@ fun ProfileCard(playerProfile: PlayerProfile) {
         modifier = Modifier
             .padding(top = 8.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
             .fillMaxWidth()
-            .wrapContentHeight(align = Alignment.Top),
+            .wrapContentHeight(align = Alignment.Top)
+            .clickable(onClick = { clickAction.invoke() }),
         elevation = 8.dp,
         backgroundColor = Color.White
     ) {
@@ -195,8 +212,16 @@ fun ProfileContent(playerName: String, onlineStatus: Boolean, alignment: Alignme
 
 @Preview(showBackground = true)
 @Composable
+fun playerProfileDetailsPreview() {
+    MyTheme() {
+        playerProfileDetailsScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 fun PlayerListPreview() {
     MyTheme() {
-        MainScreen()
+        playerListScreen(playerProfiles = playerProfileList, null)
     }
 }

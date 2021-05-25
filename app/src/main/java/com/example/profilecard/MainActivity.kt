@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.Coil
 import com.example.profilecard.ui.theme.MyTheme
@@ -56,6 +57,33 @@ fun MainScreen(playerProfiles: List<PlayerProfile> = playerProfileList) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun playerProfileDetailsScreen(playerProfiles: PlayerProfile = playerProfileList[0]) {
+    Scaffold(topBar = { AppBar() }) {
+
+        Surface(modifier = Modifier.fillMaxSize(),
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) { //specify some alignments for the card //this is the row for the text
+                ProfilePicture(playerProfiles.drawable, playerProfiles.status, 240.dp)
+                ProfileContent(playerProfiles.name, playerProfiles.status, Alignment.CenterHorizontally)
+            }
+
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun playerProfileDetailsPreview() {
+    MyTheme() {
+        playerProfileDetailsScreen()
     }
 }
 
@@ -97,15 +125,15 @@ fun ProfileCard(playerProfile: PlayerProfile) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) { //specify some alignments for the card //this is the row for the text
-            ProfilePicture(playerProfile.drawable, playerProfile.status)
-            ProfileContent(playerProfile.name, playerProfile.status)
+            ProfilePicture(playerProfile.drawable, playerProfile.status, 72.dp)
+            ProfileContent(playerProfile.name, playerProfile.status, alignment = Alignment.Start)
         }
     }
 }
 
 //this is the composable for the profile picture
 @Composable
-fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
+fun ProfilePicture(drawableId: Int, onlineStatus: Boolean, imageSize:Dp) {
     //lets wrap this picture in a card
     //because card has shape and shape can take alot of forms
     //Have the image in a circle shape card
@@ -125,7 +153,7 @@ fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
         //we need an Image: add a description and size
         Image(
             painter = painterResource(id = drawableId),
-            contentDescription = "describe the picture", modifier = Modifier.size(72.dp),
+            contentDescription = "describe the picture", modifier = Modifier.size(imageSize),
             contentScale = ContentScale.Crop
         )
         //if the image is too big, crop it
@@ -135,7 +163,7 @@ fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
 
 //this is the composable for the profile content
 @Composable
-fun ProfileContent(playerName: String, onlineStatus: Boolean) {
+fun ProfileContent(playerName: String, onlineStatus: Boolean, alignment: Alignment.Horizontal) {
     //add sum content information
     //cannot have two composables without a row or column
     //name of the user should be on top of the activity text
@@ -143,8 +171,8 @@ fun ProfileContent(playerName: String, onlineStatus: Boolean) {
     //top and bottom is column
     Column(
         modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalAlignment = alignment
     ) { //column should fill the width
 
         CompositionLocalProvider(LocalContentAlpha provides (
@@ -167,7 +195,7 @@ fun ProfileContent(playerName: String, onlineStatus: Boolean) {
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun PlayerListPreview() {
     MyTheme() {
         MainScreen()
     }

@@ -5,14 +5,5 @@ data class PlayerProfile constructor(val name: String, val status: Boolean, val 
 val playerProfileList = arrayListOf(
     PlayerProfile("Jorginho Weak", false, R.drawable.pic1),
     PlayerProfile("Mason Mount", true, R.drawable.pic2),
-    PlayerProfile("Jorginho Weak", false, R.drawable.pic1),
-    PlayerProfile("Mason Mount", true, R.drawable.pic2),
-    PlayerProfile("Jorginho Weak", false, R.drawable.pic1),
-    PlayerProfile("Mason Mount", true, R.drawable.pic2),
-    PlayerProfile("Jorginho Weak", false, R.drawable.pic1),
-    PlayerProfile("Mason Mount", true, R.drawable.pic2),
-    PlayerProfile("Jorginho Weak", false, R.drawable.pic1),
-    PlayerProfile("Mason Mount", true, R.drawable.pic2),
-    PlayerProfile("Jorginho Weak", false, R.drawable.pic1),
-    PlayerProfile("Mason Mount", true, R.drawable.pic2),
+
 )

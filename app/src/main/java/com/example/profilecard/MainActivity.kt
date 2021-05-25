@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,8 +29,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import coil.Coil
 import com.example.profilecard.ui.theme.MyTheme
@@ -49,18 +53,26 @@ class MainActivity : ComponentActivity() {
 fun playersApplication(playerProfiles: List<PlayerProfile> = playerProfileList) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "players_list") {
-        composable("players_list"){
+        composable("players_list") {
             playerListScreen(playerProfiles, navController)
         }
-        composable("player_details") {
-            playerProfileDetailsScreen()
+        composable(route = "player_details/{playerId}",
+            arguments = listOf(navArgument("playerId") {
+                type = NavType.IntType
+            })
+        ) {navBackStackEntry ->
+            playerProfileDetailsScreen(navBackStackEntry.arguments!!.getInt("playerId"), navController)
         }
     }
 }
 
 @Composable
 fun playerListScreen(playerProfiles: List<PlayerProfile>, navController: NavHostController?) {
-    Scaffold(topBar = { AppBar() }) {
+    Scaffold(topBar = { AppBar(
+        title = "Players list",
+        icon = Icons.Default.Home
+    ) { }
+    }) {
         //add a surface so that we have a background
         //Fill the screen and make the color Light gray
         Surface(modifier = Modifier.fillMaxSize(), color = Color.LightGray) {
@@ -74,7 +86,7 @@ fun playerListScreen(playerProfiles: List<PlayerProfile>, navController: NavHost
             LazyColumn {
                 items(playerProfiles) { playerProfile ->
                     ProfileCard(playerProfile = playerProfile) {
-                        navController?.navigate("player_details")
+                        navController?.navigate("player_details/${playerProfile.id}")
                     }
                 }
             }
@@ -83,18 +95,26 @@ fun playerListScreen(playerProfiles: List<PlayerProfile>, navController: NavHost
 }
 
 @Composable
-fun playerProfileDetailsScreen(playerProfiles: PlayerProfile = playerProfileList[0]) {
-    Scaffold(topBar = { AppBar() }) {
+fun playerProfileDetailsScreen(playerId: Int, navController: NavHostController?) {
+    val playerProfile = playerProfileList.first { playerProfile -> playerId == playerProfile.id }
+    Scaffold(topBar = {
+        AppBar(
+            title = "Player profile details",
+            icon = Icons.Default.ArrowBack
+        ) {navController?.navigateUp() }
+    }) {
 
-        Surface(modifier = Modifier.fillMaxSize(),
+        Surface(
+            modifier = Modifier.fillMaxSize(),
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) { //specify some alignments for the card //this is the row for the text
-                ProfilePicture(playerProfiles.drawable, playerProfiles.status, 240.dp)
-                ProfileContent(playerProfiles.name, playerProfiles.status, Alignment.CenterHorizontally)
+                ProfilePicture(playerProfile.drawable, playerProfile.status, 240.dp)
+                ProfileContent(playerProfile.name, playerProfile.status, Alignment.CenterHorizontally
+                )
             }
 
         }
@@ -102,17 +122,17 @@ fun playerProfileDetailsScreen(playerProfiles: PlayerProfile = playerProfileList
 }
 
 
-
 @Composable
-fun AppBar() {
+fun AppBar(title: String, icon: ImageVector, iconClickAction: () -> Unit) {
     TopAppBar(navigationIcon = {
         Icon(
-            Icons.Default.Home,
-            "content description",
-            Modifier.padding(horizontal = 12.dp)
+            imageVector = icon, "content description",
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .clickable(onClick = { iconClickAction.invoke() })
         )
     },
-        title = { Text("Current Football players") }
+        title = { Text(title) }
     )
 }
 
@@ -150,7 +170,7 @@ fun ProfileCard(playerProfile: PlayerProfile, clickAction: () -> Unit) {
 
 //this is the composable for the profile picture
 @Composable
-fun ProfilePicture(drawableId: Int, onlineStatus: Boolean, imageSize:Dp) {
+fun ProfilePicture(drawableId: Int, onlineStatus: Boolean, imageSize: Dp) {
     //lets wrap this picture in a card
     //because card has shape and shape can take alot of forms
     //Have the image in a circle shape card
@@ -192,15 +212,18 @@ fun ProfileContent(playerName: String, onlineStatus: Boolean, alignment: Alignme
         horizontalAlignment = alignment
     ) { //column should fill the width
 
-        CompositionLocalProvider(LocalContentAlpha provides (
-                if (onlineStatus)
-                    1f else ContentAlpha.medium)){
-            Text(text = playerName, style = MaterialTheme.typography.h5
+        CompositionLocalProvider(
+            LocalContentAlpha provides (
+                    if (onlineStatus)
+                        1f else ContentAlpha.medium)
+        ) {
+            Text(
+                text = playerName, style = MaterialTheme.typography.h5
             )
         }
 
-                //to make status text abit more transparent, we have to change its alpha
-                CompositionLocalProvider (LocalContentAlpha provides ContentAlpha.medium) {
+        //to make status text abit more transparent, we have to change its alpha
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
                 text = if (onlineStatus)
                     "Active now" else "Offline",
@@ -214,7 +237,7 @@ fun ProfileContent(playerName: String, onlineStatus: Boolean, alignment: Alignme
 @Composable
 fun playerProfileDetailsPreview() {
     MyTheme() {
-        playerProfileDetailsScreen()
+        playerProfileDetailsScreen(playerId = 0, null)
     }
 }
 
